@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Golf</string>
+    <string-array
+        name="nav_drawer_menu_items">
+        <item
+            >About</item>
+        <item
+            >New Course</item>
+        <item
+            >Scorecard</item>
+    </string-array>
+
+</resources>
