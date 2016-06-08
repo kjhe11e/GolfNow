@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">Golf</string>
-    <string-array
-        name="nav_drawer_menu_items">
-        <item
-            >About</item>
-        <item
-            >New Course</item>
-        <item
-            >Scorecard</item>
+    <string-array name="nav_drawer_menu_items">
+        <item>About</item>
+        <item>New Course</item>
+        <item>Scorecard</item>
     </string-array>
+    <string name="play_button">Play</string>
+    <string name="setup_title">Setup</string>
+    <string name="player_name_hint">Player name</string>
+    <string name="tee_off">Tee off</string>
 
 </resources>

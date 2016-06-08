@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+
+
+
+    <!-- The main content view -->
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/setup_title"
+            android:id="@+id/setup_title"
+            android:layout_gravity="center_horizontal|top"
+            android:textStyle="bold" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/begin_game_button"
+            android:text="@string/tee_off"
+            android:layout_gravity="bottom|center" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/player1_to_add"
+                android:layout_gravity="left|top"
+                android:hint="@string/player_name_hint" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/player2_to_add"
+                android:layout_gravity="left|top"
+                android:layout_below="@id/player1_to_add"
+                android:hint="@string/player_name_hint" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/player3_to_add"
+                android:layout_gravity="left|top"
+                android:layout_below="@id/player2_to_add"
+                android:hint="@string/player_name_hint" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/player4_to_add"
+                android:layout_gravity="left|top"
+                android:layout_below="@id/player3_to_add"
+                android:hint="@string/player_name_hint" />
+
+        </RelativeLayout>
+
+
+
+    </FrameLayout>
+
+
+
+
+    <!-- The navigation drawer -->
+    <ListView android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:background="#111"/>
+
+
+
+
+</android.support.v4.widget.DrawerLayout>
