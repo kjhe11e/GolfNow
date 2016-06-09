@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Created by khelle on 6/8/16.
  */
+
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database version
@@ -114,6 +115,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return player;
     }
 
+    // *This currently assumes the database is already open
     public List<Player> getAllPlayers() {
         List<Player> players = new LinkedList<Player>();
 

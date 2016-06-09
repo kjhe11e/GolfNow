@@ -22,8 +22,6 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        DatabaseHandler db = new DatabaseHandler(this);
-
 
         nav_drawer_menu_items = getResources().getStringArray(R.array.nav_drawer_menu_items);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
