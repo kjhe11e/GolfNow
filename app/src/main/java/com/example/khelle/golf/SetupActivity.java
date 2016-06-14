@@ -4,6 +4,7 @@ import com.example.khelle.golf.DatabaseHandler;
 
 import android.content.Intent;
 import android.database.DatabaseErrorHandler;
+import android.graphics.Color;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,10 +12,11 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+// TO DO: keep info on orientation change
 
 
 public class SetupActivity extends AppCompatActivity {
@@ -23,10 +25,9 @@ public class SetupActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private Button mTeeOffButton;
-    private EditText player1;
-    private EditText player2;
-    private EditText player3;
-    private EditText player4;
+    private Button mAddPlayerButton;
+    private LinearLayout mPlayerList;
+    private int playerCount;
 
 
     @Override
@@ -38,11 +39,9 @@ public class SetupActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mTeeOffButton = (Button) findViewById(R.id.begin_game_button);
-        player1 = (EditText) findViewById(R.id.player1_to_add);
-        player2 = (EditText) findViewById(R.id.player2_to_add);
-        player3 = (EditText) findViewById(R.id.player3_to_add);
-        player4 = (EditText) findViewById(R.id.player4_to_add);
-
+        mAddPlayerButton = (Button) findViewById(R.id.add_player_button);
+        mPlayerList = (LinearLayout) findViewById(R.id.linear_layout_player_list);
+        playerCount = 0;
 
 
         // Set adapter for the list view
@@ -53,42 +52,32 @@ public class SetupActivity extends AppCompatActivity {
         //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 
+        // Set AddPlayer button's click listener
+        mAddPlayerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(playerCount < 5){
+                    EditText newPlayer = new EditText(getApplicationContext());
+                    newPlayer.setHint("Player name");
+                    newPlayer.setHintTextColor(Color.parseColor("#000000"));
+                    newPlayer.setTextColor(Color.parseColor("#000000"));
+                    mPlayerList.addView(newPlayer, 0);
+                    playerCount++;
+                } else {
+                    Toast.makeText(getApplicationContext(), "Max 5 players per game", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
         // Set TeeOff button's click listener
         mTeeOffButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SimpleDateFormat currentDateAndTime = new SimpleDateFormat("yyyyMMdd_HHmmss");
-                String dateAndTime = currentDateAndTime.format(new Date());
-                DatabaseHandler db = new DatabaseHandler(getApplicationContext());
-
-                if(player1.getText().toString().equals("")){
-                    // do not add
-                } else {
-                    String player1Name = player1.getText().toString();
-                    db.addPlayer(new Player(player1Name, dateAndTime));
+                for(int i = 0; i < mPlayerList.getChildCount(); i++){
+                    EditText player = (EditText) mPlayerList.getChildAt(i);
+                    String playerName = player.getText().toString();
                 }
-
-                if(player2.getText().toString().equals("")){
-                    // do not add
-                } else {
-                    String player2Name = player2.getText().toString();
-                    db.addPlayer(new Player(player2Name, dateAndTime));
-                }
-
-                if(player3.getText().toString().equals("")){
-                    // do not add
-                } else {
-                    String player3Name = player3.getText().toString();
-                    db.addPlayer(new Player(player3Name, dateAndTime));
-                }
-
-                if(player4.getText().toString().equals("")){
-                    // do not add
-                } else {
-                    String player4Name = player4.getText().toString();
-                    db.addPlayer(new Player(player4Name, dateAndTime));
-                }
-
                 startGame(v);
             }
         });

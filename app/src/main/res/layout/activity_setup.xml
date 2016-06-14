@@ -23,50 +23,27 @@
             android:layout_gravity="center_horizontal|top"
             android:textStyle="bold" />
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/linear_layout_player_list"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/add_player_button"
+            android:text="@string/add_player"
+            android:layout_gravity="bottom|left" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/begin_game_button"
             android:text="@string/tee_off"
-            android:layout_gravity="bottom|center" />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/player1_to_add"
-                android:layout_gravity="left|top"
-                android:hint="@string/player_name_hint" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/player2_to_add"
-                android:layout_gravity="left|top"
-                android:layout_below="@id/player1_to_add"
-                android:hint="@string/player_name_hint" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/player3_to_add"
-                android:layout_gravity="left|top"
-                android:layout_below="@id/player2_to_add"
-                android:hint="@string/player_name_hint" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/player4_to_add"
-                android:layout_gravity="left|top"
-                android:layout_below="@id/player3_to_add"
-                android:hint="@string/player_name_hint" />
-
-        </RelativeLayout>
-
+            android:layout_gravity="bottom|right" />
 
 
     </FrameLayout>

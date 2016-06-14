@@ -9,5 +9,6 @@
     <string name="setup_title">Setup</string>
     <string name="player_name_hint">Player name</string>
     <string name="tee_off">Tee off</string>
+    <string name="add_player">Add player</string>
 
 </resources>
