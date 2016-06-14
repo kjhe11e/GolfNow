@@ -74,18 +74,31 @@ public class SetupActivity extends AppCompatActivity {
         mTeeOffButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                int numPlayers = 0;
+                Bundle extras = new Bundle();
+
                 for(int i = 0; i < mPlayerList.getChildCount(); i++){
                     EditText player = (EditText) mPlayerList.getChildAt(i);
                     String playerName = player.getText().toString();
+                    if(playerName != ""){
+                        extras.putString("player"+i, playerName);
+                        numPlayers++;
+                    } else {
+                        // do nothing
+                    }
                 }
-                startGame(v);
+
+                // Pass playerCount to Game activity to populate scorecard
+                extras.putInt("playerCount", numPlayers);
+
+                if(numPlayers > 0) {
+                    Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+                    intent.putExtras(extras);
+                    startActivity(intent);
+                }
             }
         });
-    }
-
-    public void startGame(View view) {
-        Intent intent = new Intent(this, GameActivity.class);
-        startActivity(intent);
     }
 
 }
