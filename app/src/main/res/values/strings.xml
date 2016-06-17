@@ -10,5 +10,25 @@
     <string name="player_name_hint">Player name</string>
     <string name="tee_off">Tee off</string>
     <string name="add_player">Add player</string>
+    <string-array name="hole_number">
+        <item>Hole1</item>
+        <item>Hole2</item>
+        <item>Hole3</item>
+        <item>Hole4</item>
+        <item>Hole5</item>
+        <item>Hole6</item>
+        <item>Hole7</item>
+        <item>Hole8</item>
+        <item>Hole9</item>
+        <item>Hole10</item>
+        <item>Hole11</item>
+        <item>Hole12</item>
+        <item>Hole13</item>
+        <item>Hole14</item>
+        <item>Hole15</item>
+        <item>Hole16</item>
+        <item>Hole17</item>
+        <item>Hole18</item>
+    </string-array>
 
 </resources>

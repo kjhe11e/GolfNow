@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, nav_drawer_menu_items));
 
-        // Set list's click listener
+        // Set drawer list's click listener
         //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // Set mainPlayButton's click listener

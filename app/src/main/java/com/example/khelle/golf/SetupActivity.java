@@ -27,7 +27,7 @@ public class SetupActivity extends AppCompatActivity {
     private Button mTeeOffButton;
     private Button mAddPlayerButton;
     private LinearLayout mPlayerList;
-    private int playerCount;
+    private Integer playerCount = 0;
 
 
     @Override
@@ -48,7 +48,7 @@ public class SetupActivity extends AppCompatActivity {
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, nav_drawer_menu_items));
 
-        // Set list's click listener
+        // Set drawer list's click listener
         //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 
@@ -64,7 +64,7 @@ public class SetupActivity extends AppCompatActivity {
                     mPlayerList.addView(newPlayer, 0);
                     playerCount++;
                 } else {
-                    Toast.makeText(getApplicationContext(), "Max 5 players per game", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Max 5 players per game", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -75,8 +75,8 @@ public class SetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                int numPlayers = 0;
                 Bundle extras = new Bundle();
+                int numPlayers = 0;
 
                 for(int i = 0; i < mPlayerList.getChildCount(); i++){
                     EditText player = (EditText) mPlayerList.getChildAt(i);
@@ -89,13 +89,14 @@ public class SetupActivity extends AppCompatActivity {
                     }
                 }
 
-                // Pass playerCount to Game activity to populate scorecard
-                extras.putInt("playerCount", numPlayers);
-
                 if(numPlayers > 0) {
+                    // Pass playerCount to Game activity to populate scorecard
+                    extras.putInt("numPlayers", numPlayers);
                     Intent intent = new Intent(getApplicationContext(), GameActivity.class);
                     intent.putExtras(extras);
                     startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Enter at least 1 player", Toast.LENGTH_SHORT).show();
                 }
             }
         });
