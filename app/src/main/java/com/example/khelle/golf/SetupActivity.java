@@ -16,6 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // TO DO: keep info on orientation change
 
 
@@ -42,6 +45,7 @@ public class SetupActivity extends AppCompatActivity {
         mAddPlayerButton = (Button) findViewById(R.id.add_player_button);
         mPlayerList = (LinearLayout) findViewById(R.id.linear_layout_player_list);
         playerCount = 0;
+
 
 
         // Set adapter for the list view
@@ -76,22 +80,22 @@ public class SetupActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle extras = new Bundle();
-                int numPlayers = 0;
+                ArrayList<String> playerNames = new ArrayList<String>();
 
                 for(int i = 0; i < mPlayerList.getChildCount(); i++){
                     EditText player = (EditText) mPlayerList.getChildAt(i);
                     String playerName = player.getText().toString();
-                    if(playerName != ""){
-                        extras.putString("player"+i, playerName);
-                        numPlayers++;
+                    if(playerName.length() != 0){
+                        playerNames.add(playerName);
                     } else {
                         // do nothing
                     }
                 }
 
-                if(numPlayers > 0) {
+                if(playerNames.size() > 0) {
                     // Pass playerCount to Game activity to populate scorecard
-                    extras.putInt("numPlayers", numPlayers);
+                    //extras.putInt("numPlayers", numPlayers);
+                    extras.putStringArrayList("playerNames", playerNames);
                     Intent intent = new Intent(getApplicationContext(), GameActivity.class);
                     intent.putExtras(extras);
                     startActivity(intent);
