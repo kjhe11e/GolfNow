@@ -18,6 +18,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,46 +27,46 @@ import java.util.Locale;
 import java.util.Vector;
 import java.lang.*;
 
-// This is sloppy code as this needs to be refactored to more common, reusable methods
-// This was tested manually; there are several bugs in this code.
-
 //////////////////////////////////////////////////////////////////////////
 // TO DO: Keep info on orientation change
-// TO DO: Refactor this code into smaller reusable methods/functions
 // TO DO: Set drawer list's click listener
 //////////////////////////////////////////////////////////////////////////
 
 public class GameActivity extends AppCompatActivity {
-
     private String[] nav_drawer_menu_items;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private TableLayout mPlayerScorecardTable;
-    int currentHole = 0;
     private final int REQ_CODE_SPEECH_INPUT = 100;
-    private int numberOfPlayers;
+    private int numPlayers;
     private ArrayList<ArrayList<Integer>> gameScorecard = new ArrayList<ArrayList<Integer>>();
-    private int scoresRecorded;
-    private boolean readyForNextHole = true;
+    int currentHole = 0;
+    final String[] holeNumbers = {"Hole 1", "Hole 2", "Hole 3", "Hole 4", "Hole 5", "Hole 6",
+            "Hole 7", "Hole 8", "Hole 9", "Hole 10", "Hole 11", "Hole 12", "Hole 13", "Hole 14",
+            "Hole 15", "Hole 16", "Hole 17", "Hole 18"};
+    private ArrayList<String> playerNames;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+
         nav_drawer_menu_items = getResources().getStringArray(R.array.nav_drawer_menu_items);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mPlayerScorecardTable = (TableLayout) findViewById(R.id.player_score_table_layout);
-        final String[] holeNumbers = {"Hole 1", "Hole 2", "Hole 3", "Hole 4", "Hole 5", "Hole 6",
-        "Hole 7", "Hole 8", "Hole 9", "Hole 10", "Hole 11", "Hole 12", "Hole 13", "Hole 14",
-        "Hole 15", "Hole 16", "Hole 17", "Hole 18"};
         currentHole = 1;
-
 
         // Set adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, nav_drawer_menu_items));
+
+
+        Intent intent = getIntent();
+        playerNames = intent.getStringArrayListExtra("playerNames");
+        numPlayers = playerNames.size();
+
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // *****************************************************************************************
@@ -75,20 +77,21 @@ public class GameActivity extends AppCompatActivity {
         //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 
-        Intent intent = getIntent();
-        ArrayList<String> playerNames = intent.getStringArrayListExtra("playerNames");
-        final int numPlayers = playerNames.size();
-        numberOfPlayers = playerNames.size();
+        initializeScorecardView(playerNames);
+        initializePlayerScorecard(numPlayers);
+        setupNavInfoAndNextBtnOnClick();
+    }
 
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Initialize scorecard view based on number of players:
-        ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Initialize scorecard view based on number of players:
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    private void initializeScorecardView(ArrayList playerNames){
         for(int j =0; j < numPlayers; j++) {
             //String playerName = intent.getStringExtra("player"+j);
             TableRow playerRow = new TableRow(this.getApplicationContext());
             TextView pNameTextView = new TextView(this.getApplicationContext());
-            pNameTextView.setText(playerNames.get(j));
+            pNameTextView.setText(playerNames.get(j).toString());
             pNameTextView.setTextColor(Color.parseColor("#000000"));
             EditText pScore = new EditText(getApplicationContext());
             pScore.setHint("need score");
@@ -100,141 +103,46 @@ public class GameActivity extends AppCompatActivity {
             playerRow.addView(pNameTextView);
             playerRow.addView(pScore);
             mPlayerScorecardTable.addView(playerRow);
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Add enterScores speech-2-text button for recording:
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            Button recordScoresBtn = new Button(this.getApplicationContext());
+            recordScoresBtn.setText("Enter scores");
+            TableRow recordScoresRow = new TableRow(this.getApplicationContext());
+            recordScoresRow.addView(recordScoresBtn);
+            recordScoresRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+            mPlayerScorecardTable.addView(recordScoresRow);
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // recordScoresBtn's onClickListener, should do the following:
+            // 1) Open speech prompter to get scores via voice
+            // 2) Populate the players scores with the scores obtained from step 1
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            recordScoresBtn.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    promptSpeechInput();
+                }
+
+            });
         }
+    }
 
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Add enterScores speech-2-text button for recording:
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        Button recordScoresBtn = new Button(this.getApplicationContext());
-        recordScoresBtn.setText("Enter scores");
-        TableRow recordScoresRow = new TableRow(this.getApplicationContext());
-        recordScoresRow.addView(recordScoresBtn);
-        recordScoresRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
-        mPlayerScorecardTable.addView(recordScoresRow);
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Create ArrayList<Integer> for each player to hold scores in gameScorecard
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        for(int i = 0; i < numPlayers; i++){
+    private void initializePlayerScorecard(int numPlayers){
+        for(int j = 0; j < numPlayers; j++){
             ArrayList<Integer> playerScorecard = new ArrayList<Integer>();
-            gameScorecard.add(i, playerScorecard);
+            gameScorecard.add(playerScorecard);
         }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // recordScoresBtn's onClickListener, should do the following:
-        // 1) Open speech prompter to get scores via voice
-        // 2) Populate the players scores with the scores obtained from step 1
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        recordScoresBtn.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View v) {
-                promptSpeechInput();
-            }
-
-        });
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Set up navigation info (hole number and Next button) below scorecard:
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        final TextView holeNum = new TextView(this.getApplicationContext());
-        holeNum.setText(holeNumbers[currentHole-1]);
-        holeNum.setTextColor(Color.parseColor("#000000"));
-        Button nextHole = new Button(this.getApplicationContext());
-        nextHole.setText("Next");
-        nextHole.setTextColor(Color.parseColor("#000000"));
-        TableRow navInfoRow = new TableRow(this.getApplicationContext());
-        navInfoRow.addView(holeNum);
-        navInfoRow.addView(nextHole);
-        navInfoRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
-                TableRow.LayoutParams.MATCH_PARENT, 1.0f));
-        mPlayerScorecardTable.addView(navInfoRow);
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // nextHole button's onClickListener, should do the following:
-        // 1) Save player scores
-        // 2) Increment hole number to go to next hole
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        nextHole.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                for(int i = 0; i < numPlayers; i++){
-                    //get each player's score
-                    TableRow playerRow = (TableRow) mPlayerScorecardTable.getChildAt(i);
-                    EditText playerScore = (EditText) playerRow.getChildAt(1);
-                    String scoreInput = playerScore.getText().toString();
-                    try{
-                        int pScore = Integer.parseInt(scoreInput);
-                        Log.i("", "Logged player score " + scoreInput);
-                    } catch(NumberFormatException e){
-                        readyForNextHole = false;
-                        TextView playerName = (TextView) playerRow.getChildAt(0);
-                        String pName = playerName.getText().toString();
-                        Toast.makeText(getApplicationContext(), pName + " does not have a valid score", Toast.LENGTH_SHORT).show();
-                        Log.i("", scoreInput + " is not a valid score for player " + pName);
-                    }
-                }
-
-                if(currentHole >= 18){
-                    readyForNextHole = false;
-                    Toast.makeText(getApplicationContext(), "Game over, congratulations", Toast.LENGTH_SHORT).show();
-                    // Process final scores here
-                    for(int j = 0; j < numberOfPlayers; j++){
-                        TableRow tr = (TableRow) mPlayerScorecardTable.getChildAt(j);
-                        TextView player = (TextView) tr.getChildAt(1);  //the "score" column
-                        String score = player.getText().toString();
-                        Integer pScore = Integer.parseInt(score);
-                        gameScorecard.get(j).add(pScore);
-                    }
-                    Log.i("", "After hole " + currentHole + ", gameScorecard is " + gameScorecard);
-                    for(int j = 0; j < numPlayers; j++){
-                        //sum up player's score
-                        int playerTotalScore = 0;
-                        for(int k = 0; k < gameScorecard.get(j).size(); k++){
-                            // SHOULD CHECK FOR BAD DATA HERE
-                            playerTotalScore += gameScorecard.get(j).get(k);
-                        }
-                        Log.i("", "Player" + j + " had a score of " + playerTotalScore);
-                    }
-                    Intent resultsIntent = new Intent(getApplicationContext(), ResultsActivity.class);
-                    resultsIntent.putExtra("numberOfPlayers", numberOfPlayers);
-                    resultsIntent.putExtra("gameScorecard", gameScorecard);
-                    startActivity(resultsIntent);
-                }
-                else{
-                    for(int j = 0; j < numberOfPlayers; j++){
-                        TableRow tr = (TableRow) mPlayerScorecardTable.getChildAt(j);
-                        TextView player = (TextView) tr.getChildAt(1);  //the "score" column
-                        String score = player.getText().toString();
-                        Integer pScore = Integer.parseInt(score);
-                        gameScorecard.get(j).add(pScore);
-                    }
-                    Log.i("", "After hole " + currentHole + ", gameScorecard is " + gameScorecard);
-                    for(int k = 0; k < numberOfPlayers; k++){
-                        int currentTotal = 0;
-                        for(int n = 0; n < gameScorecard.get(k).size(); n++){
-                            currentTotal += gameScorecard.get(k).get(n);
-                        }
-                        Log.i("", "Player" + k + " has a current score of " + currentTotal);
-                    }
-                    currentHole++;
-                    holeNum.setText(holeNumbers[currentHole - 1]);
-                }
-            }
-        });
+        Log.i("", "After scorecard initialization, gameScorecard is: " + gameScorecard.toString());
     }
 
 
     // showing Google speech input dialog
     private void promptSpeechInput() {
-        gameScorecard.clear();
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -252,73 +160,122 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-    // receiving speech input
+    // Receiving speech input:
     // This will populate the players' scores based on the input string of data from the RecognizerIntent
     // Input from RecognizerIntent is a string of data (scores), which will be parsed for scores
     // and assigned to the players in order
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
+        switch(requestCode){
             case REQ_CODE_SPEECH_INPUT: {
-                if (resultCode == RESULT_OK && data != null) {
+                if(resultCode == RESULT_OK && data != null){
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    int scoresRecorded = 0;
                     String scoresToParse = result.get(0);
-                    //Toast.makeText(this.getApplicationContext(), scoresToParse, Toast.LENGTH_LONG).show();
+                    Log.i("", "scoresToParse content is: " + scoresToParse);
                     String[] scoresInput = scoresToParse.split(" ");
-                    Log.i("", "Score input is: " + scoresInput);
+                    Log.i("", "scoresInput content is: " + scoresInput.toString());
 
-                    // Get the first n scores for n number of players
-                    for(int j = 0, k = 0; j < scoresInput.length && k < numberOfPlayers; j++){
+                    for(int j = 0, k = 0; j < scoresInput.length && k < numPlayers; j++){
                         String score = scoresInput[j];
-                        if(isInteger(score, 10)){
-                            int validScore = Integer.parseInt(score);
-                            Log.i("", "gameScorecard is " + gameScorecard.toString());
-                            gameScorecard.get(j).add(validScore);
-                            k++;
-                            scoresRecorded = k;
+                        try{
+                            int playerScore = Integer.parseInt(score);
+                            gameScorecard.get(k).add(playerScore);
+                            scoresRecorded++;
+                            TableRow tr = (TableRow) mPlayerScorecardTable.getChildAt(j);
+                            TextView playerScoreTextView = (TextView) tr.getChildAt(1);
+                            playerScoreTextView.setText(Integer.toString(playerScore));
+                        } catch(NumberFormatException e){
+                            Toast.makeText(getApplicationContext(), "The following score is invalid: " + score, Toast.LENGTH_LONG).show();
+                            Log.i("", "The following score is invalid: " + score);
                         }
                     }
-                    Log.i("", "onActivityResult: gameScorecard is " + gameScorecard);
-                }
-                break;
-            }
-        }
+                    Log.i("", "GameScorecard content is: " + gameScorecard.toString());
 
-        if(scoresRecorded < numberOfPlayers){
-            //prompt them to enter again
-            Toast.makeText(this.getApplicationContext(), "Not enough scores recorded, please try again", Toast.LENGTH_LONG).show();
-        } else {
-            for(int j = 0; j < numberOfPlayers; j++){
-                TableRow tr = (TableRow) mPlayerScorecardTable.getChildAt(j);
-                TextView player = (TextView) tr.getChildAt(1);  //the "score" column
-                player.setText(gameScorecard.get(j).toString());
+                    if(scoresRecorded < numPlayers){
+                        Toast.makeText(this.getApplicationContext(), "Not enough scores recorded, please try again", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
         }
     }
 
 
-    // Method that returns boolean whether string is number
-    protected boolean isInteger(String s, int radix){
-        if(s.isEmpty()){
-            return false;
-        }
-        for(int k = 0; k < s.length(); k++){
-            if(k == 0 && s.charAt(k) == '-') {
-                if (s.length() == 1) {
-                    return false;
-                } else {
-                    continue;
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Set up navigation info (hole number and Next button) below scorecard:
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    private void setupNavInfoAndNextBtnOnClick(){
+        final TextView holeNum = new TextView(this.getApplicationContext());
+        holeNum.setText(holeNumbers[currentHole-1]);
+        holeNum.setTextColor(Color.parseColor("#000000"));
+        Button nextHole = new Button(this.getApplicationContext());
+        nextHole.setText("Next");
+        nextHole.setTextColor(Color.parseColor("#000000"));
+        TableRow navInfoRow = new TableRow(this.getApplicationContext());
+        navInfoRow.addView(holeNum);
+        navInfoRow.addView(nextHole);
+        navInfoRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.MATCH_PARENT, 1.0f));
+        mPlayerScorecardTable.addView(navInfoRow);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // nextHole button's onClickListener, should do the following:
+        // 1) Save player scores
+        // 2) Increment hole number to go to next hole
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        nextHole.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                Log.i("", "gameScorecard content is: " + gameScorecard.toString());
+                for(int j = 0; j < numPlayers; j++){
+                    //get each player's score
+                    TableRow playerRow = (TableRow) mPlayerScorecardTable.getChildAt(j);
+                    EditText playerScore = (EditText) playerRow.getChildAt(1);
+                    String scoreInput = playerScore.getText().toString();
+                    try{
+                        int pScore = Integer.parseInt(scoreInput);
+                        gameScorecard.get(j).add(pScore);
+                    } catch(NumberFormatException e){
+                        TextView playerNameColumn = (TextView) playerRow.getChildAt(0);
+                        String playerName = playerNameColumn.getText().toString();
+                        Toast.makeText(getApplicationContext(), playerName + " does not have a valid score", Toast.LENGTH_LONG).show();
+                        Log.i("", scoreInput + " is not a valid score for player " + playerName);
+                    }
+                    Log.i("", "After hole " + currentHole + ", gameScorecard is: " + gameScorecard.toString());
+                }
+
+                if(currentHole >= 18){
+                    Toast.makeText(getApplicationContext(), "Game over, congratulations", Toast.LENGTH_SHORT).show();
+
+                    Intent resultsIntent = new Intent(getApplicationContext(), ResultsActivity.class);
+                    resultsIntent.putExtra("numPlayers", numPlayers);
+                    //resultsIntent.putExtra("gameScorecard", gameScorecard);
+                    resultsIntent.putStringArrayListExtra("playerNames", playerNames);
+                    ArrayList<Integer> totalScores = new ArrayList<Integer>();
+
+                    for(int j = 0; j < numPlayers; j++){
+                        //sum up player's score
+                        int playerTotalScore = 0;
+                        for(int k = 0; k < gameScorecard.get(j).size(); k++){
+                            // SHOULD CHECK FOR BAD DATA HERE
+                            playerTotalScore += gameScorecard.get(j).get(k);
+                        }
+                        totalScores.add(playerTotalScore);
+                        Log.i("", "Player" + j + " had a score of " + playerTotalScore);;
+                    }
+                    resultsIntent.putIntegerArrayListExtra("totalScores", totalScores);
+                    startActivity(resultsIntent);
+
+                } else{
+                    currentHole++;
+                    holeNum.setText(holeNumbers[currentHole - 1]);
                 }
             }
-            if(Character.digit(s.charAt(k), radix) < 0) {
-                return false;
-            }
-        }
-        return true;
+        });
+
     }
 
 
 }
-
