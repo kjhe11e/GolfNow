@@ -187,6 +187,7 @@ public class GameActivity extends AppCompatActivity {
                             TableRow tr = (TableRow) mPlayerScorecardTable.getChildAt(j);
                             TextView playerScoreTextView = (TextView) tr.getChildAt(1);
                             playerScoreTextView.setText(Integer.toString(playerScore));
+
                         } catch(NumberFormatException e){
                             Toast.makeText(getApplicationContext(), "The following score is invalid: " + score, Toast.LENGTH_LONG).show();
                             Log.i("", "The following score is invalid: " + score);
